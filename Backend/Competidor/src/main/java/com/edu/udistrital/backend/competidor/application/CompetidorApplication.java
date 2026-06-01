@@ -1,4 +1,4 @@
-package com.edu.udistrital.backend.competidor;
+package com.edu.udistrital.backend.competidor.application;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
