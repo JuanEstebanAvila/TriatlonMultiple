@@ -172,8 +172,28 @@ public class ControllerCompetidor {
         return ResponseEntity.status(HttpStatus.OK).body(service.eliminarCompetidor(id)); //200 y delegación al service para que elimine al competidor
     }
 
+    /**
+     * Método tipo PATCH que registra un competidor en una carrera (este registro necesito de Carrera para hacer el registro)
+     * @param id
+     * @param cuerpo
+     * @return
+     */
     @RequestMapping(value = "/registrarcarrera/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<?> registrarCarrera(@0)
+    public ResponseEntity<?> registrarCarrera(@PathVariable("id")Long id, @RequestBody Map<String, String> cuerpo){
+        return ResponseEntity.status(HttpStatus.OK).body(service.registrarCarrera(cuerpo.get("Carrera")));
+    }
+
+
+    /**
+     * Método tipo que GET que consulta la carrera a la que pertenece un competidor identificado con un id,
+     * esta consulta incorpora al API "Carrera"
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/consultarcarrera/{id}", method = RequestMethod.GET)
+    public ResponseEntity<?> consultarCarrera(@PathVariable("id") Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(service.consultarCarrera(id));
+    }
 
 
 
