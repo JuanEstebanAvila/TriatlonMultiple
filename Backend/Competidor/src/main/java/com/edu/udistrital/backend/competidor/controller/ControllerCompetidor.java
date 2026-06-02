@@ -5,13 +5,13 @@ package com.edu.udistrital.backend.competidor.controller;
  */
 
 import com.edu.udistrital.backend.competidor.model.CompetidorDTO;
-import com.edu.udistrital.backend.competidor.service.ServiceCompetidor;
+import com.edu.udistrital.backend.competidor.model.CompetidorResponse;
+import com.edu.udistrital.backend.competidor.service.ServiceCompetidorImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,10 +19,10 @@ import java.util.Map;
 @RequestMapping("/api/competidor")
 public class ControllerCompetidor {
 
-    private ServiceCompetidor service;
+    private ServiceCompetidorImpl service;
 
     //Inyección por medio de constructor del service
-    public ControllerCompetidor(ServiceCompetidor service){
+    public ControllerCompetidor(ServiceCompetidorImpl service){
         this.service = service;
     }
 
@@ -35,7 +35,7 @@ public class ControllerCompetidor {
     //Mapea lo proveniente de la URL en un objeto de tipo CompetidorDTO y valida sus campos
     public ResponseEntity<?> crearCompetidor (@Valid  @RequestBody CompetidorDTO datosCompetidor){
         try{
-            return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(datosCompetidor));
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.crearCompetidor(datosCompetidor));
             //Si la petición resulta exitosa se muestra el código 200
         }catch (RuntimeException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -53,7 +53,7 @@ public class ControllerCompetidor {
     @RequestMapping( value = "/modificarnombre/{id}", method = RequestMethod.PATCH)
     //Se identifica el competidor a modificar con el id (que es guardado en una variable de tipo Long)
     //En el cuerpo de la petición viene el nuevo nombre del competidor
-    public ResponseEntity<?> modificarNombre(@PathVariable("id") Long id, @RequestBody Map<String, String> cuerpo){
+    public ResponseEntity<?> modificarNombre(@PathVariable Long id, @RequestBody Map<String, String> cuerpo){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(service.modNombre(id, cuerpo.get("nombre")));
             //Si fue exitoso el cambio se muestra el código de éxito 200
@@ -70,7 +70,7 @@ public class ControllerCompetidor {
      * @return
      */
     @RequestMapping( value = "/modificaridentificacion/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<?> modificarIdentificacion(@PathVariable("id") Long id, @RequestBody Map<String, String> cuerpo){
+    public ResponseEntity<?> modificarIdentificacion(@PathVariable Long id, @RequestBody Map<String, String> cuerpo){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(service.modIdentificacion(id, cuerpo.get("identificacion"))); //Delega al service y devuelve 200
         }catch (RuntimeException e){
@@ -85,7 +85,7 @@ public class ControllerCompetidor {
      * @return
      */
     @RequestMapping( value = "/modificarcategoriaedad/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<?> modificarCategoriaEdad(@PathVariable("id") Long id, @RequestBody Map<String, String> cuerpo){
+    public ResponseEntity<?> modificarCategoriaEdad(@PathVariable Long id, @RequestBody Map<String, String> cuerpo){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(service.modCategoriaEdad(id, cuerpo.get("categoriaEdad")));//Devuelve 200 y delega al serice
         } catch (RuntimeException e){
@@ -101,7 +101,7 @@ public class ControllerCompetidor {
      * @return
      */
     @RequestMapping( value = "/modificargenero/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<?> modificarGenero(@PathVariable("id") Long id, @RequestBody Map<String, String> cuerpo){
+    public ResponseEntity<?> modificarGenero(@PathVariable Long id, @RequestBody Map<String, String> cuerpo){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(service.modGenero(id, cuerpo.get("genero")));
         }catch (RuntimeException e){
@@ -115,8 +115,8 @@ public class ControllerCompetidor {
      * @return competidor
      */
     @RequestMapping(value = "/consultarcompetidor/{id}", method = RequestMethod.GET)
-    public ResponseEntity<?> consultarCompetidor(@PathVariable("id") Long id){
-            CompetidorDTO competidor = service.buscarCompetidor(id);
+    public ResponseEntity<?> consultarCompetidor(@PathVariable Long id){
+            CompetidorResponse competidor = service.buscarCompetidor(id);
             return ResponseEntity.status(HttpStatus.OK).body(competidor); //200 y el competidor consultado su todo sale bien
     }
 
@@ -168,7 +168,7 @@ public class ControllerCompetidor {
      * @return
      */
     @RequestMapping(value = "/eliminar/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> eliminarCompetidor(@PathVariable("id")Long id){ //Toma el id del competidor a eliminar que viene de la url
+    public ResponseEntity<?> eliminarCompetidor(@PathVariable Long id){ //Toma el id del competidor a eliminar que viene de la url
         return ResponseEntity.status(HttpStatus.OK).body(service.eliminarCompetidor(id)); //200 y delegación al service para que elimine al competidor
     }
 
@@ -179,7 +179,7 @@ public class ControllerCompetidor {
      * @return
      */
     @RequestMapping(value = "/registrarcarrera/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<?> registrarCarrera(@PathVariable("id")Long id, @RequestBody Map<String, String> cuerpo){
+    public ResponseEntity<?> registrarCarrera(@PathVariable Long id, @RequestBody Map<String, String> cuerpo){
         return ResponseEntity.status(HttpStatus.OK).body(service.registrarCarrera(cuerpo.get("Carrera")));
     }
 
@@ -191,7 +191,7 @@ public class ControllerCompetidor {
      * @return
      */
     @RequestMapping(value = "/consultarcarrera/{id}", method = RequestMethod.GET)
-    public ResponseEntity<?> consultarCarrera(@PathVariable("id") Long id){
+    public ResponseEntity<?> consultarCarrera(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(service.consultarCarrera(id));
     }
 

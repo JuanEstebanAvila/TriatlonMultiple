@@ -1,13 +1,14 @@
 package com.edu.udistrital.backend.competidor.config;
 
-import com.edu.udistrital.backend.competidor.service.ServiceCompetidor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Properties;
 
 /**
  * Clase de configuraciones del aplicativo, incorpora varios @Bean para las CORS, el ModelMapper y el WebClient
@@ -51,6 +52,42 @@ public class Configuraciones {
     @Bean
     public WebClient webClientBean(){
         return WebClient.builder().baseUrl(urlApiCarrera).build(); //Se usa la variable que tiene el contenido en el properties
+    }
+
+    //Datos provenientes del archivo "application.properties", extrae los datos del archivo de propiedades para no exponer información directamente en el código
+    @Value("${api.correo.contrasena}")
+    private String contrasena;
+
+    @Value("${api.correo.usuario}")
+    private String usuario;
+
+    @Value("${api.correo.puerto}")
+    private String puerto;
+
+    @Value("${api.correo.provedor}")
+    private String provedor;
+
+    /**
+     * Configuración del correo
+     * Código creado por : "Un Programador Nace"
+     * Obtenido en : "https://www.youtube.com/watch?v=JKmzV1MY_-M&list=PLr23_YfwEbPTWw4-3h5Wqs_PIzbtBSQMM&index=12"
+     */
+    @Bean
+    JavaMailSender getJavaMailSender(){
+        JavaMailSenderImpl mail = new JavaMailSenderImpl();
+
+        mail.setHost(provedor);//Provedor que usaremos, en nuestro caso Gmail de Google
+        mail.setPort(puerto); //Puerto estandar para el envío
+        mail.getUsername(usuario);//Correo que envíar el correo
+        mail.setPassword(contrasena);//Clave de aplicación
+
+        Properties properties = mail.getJavaMailProperties();
+        properties.put("mail.trasport.protocol", "smtp"); //Establece el prótocolo para el envío del correo
+        properties.put("mail.smtp.auth", "true"); //Cuando use el prótocolo se autenticará con el usuario y contraseña
+        properties.put("mail.smtp.starttls.enable", "true"); //Toda la comunicación estará cifrada, como medida de seguridad
+        properties.put("mail.debug", "true"); //Para que aparezca en consola si se envío o no el correo
+
+        return mail;
     }
 
 }

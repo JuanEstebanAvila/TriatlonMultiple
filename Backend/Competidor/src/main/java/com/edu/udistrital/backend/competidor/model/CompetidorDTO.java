@@ -16,7 +16,7 @@ public class CompetidorDTO extends Persona{
 
     @Id //Llave primaría de la base de datos
     @GeneratedValue(strategy = GenerationType.IDENTITY) //Autoincremental
-    private int id;
+    private Long id;
 
     //La URL de la foto
     @NotBlank(message = "La foto no puede estar vacía")
@@ -38,16 +38,16 @@ public class CompetidorDTO extends Persona{
     @Column(name = "especialidad", nullable = false, length = 30)
     private String especialidad;
 
-    @Column(name = "carrera")
-    private String carrera;
+    @Column(name = "id_carrera")
+    private String idCarrera;
 
     //Constructor que no tiene la llave primaria "id"
-    public CompetidorDTO(String nombre, int edad, String genero, int identificacion, String correo, String foto, Boolean modalidadCross, String categoria, String especialidad, String carrera) {
+    public CompetidorDTO(String nombre, int edad, String genero, int identificacion, String correo, String foto, Boolean modalidadCross, String categoria, String especialidad, String idCarrera) {
         super(nombre, edad, genero, identificacion, correo);
         this.foto = foto;
         this.modalidadCross = modalidadCross;
         this.categoria = categoria;
         this.especialidad = especialidad;
-        this.carrera = carrera;
+        this.idCarrera = idCarrera;
     }
 }
