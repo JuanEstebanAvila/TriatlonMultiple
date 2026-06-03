@@ -1,0 +1,141 @@
+<!-- para despues de la consulta salgan los atletas -->
+<html>
+<head>
+  <title>Listado</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="../css/style.css" type="text/css"/>
+
+</head>
+<body>
+
+<!-- barra de navegacion (nav bar) -->
+<!--sticky-top esto sirve por si queremos que la nav bar baje con nosotros-->
+<nav class="navbar navbar-expand navbar-dark bg-institucional shadow-sm">
+  <div class="container">
+
+    <!-- logo ud como boton por etiqueta <a> y href -->
+
+    <a class="navbar-brand d-flex align-items-center" href="../index.html">
+      <img src="../img/Logo Oficial UD sin color en png.png" alt="img-UD" width="80" class="me-2"/>
+      <div class="lh-1">
+        <span class="fw-bold d-block">TRIATLÓN </span>
+        <small class="style-subtitle" style="font-size: 0.7rem;">Ingeniería de Sistemas</small>
+      </div>
+    </a>
+
+    <div class="navbar-nav">
+      <a class="nav-link" href="../index.html">Inicio</a>
+      <a class="nav-link" href="registro.html">Registro</a>
+      <a class="nav-link" href="consulta.html">Consulta atletas</a>
+      <a class="nav-link" href="carreras.html">Carreras</a>
+      <a class="nav-link" href="categorias.html">Categorías</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-institucional"> Listado de triatletas</h2>
+      <p class="text-muted"> Consulta y gestiona los deportitas inscritos en el triathlon</p>
+    </div>
+    <div class="btn-group shadow-sm">
+      <button class="btn btn-outline-primary active" id="vista-table-btn">
+        <i class="bi bi-table"></i> Tabla
+      </button>
+      <button class="btn btn-outline-primary" id="vista-cards-btn">
+        <i class="bi bi-grid-3x3-gap"></i>Tarjetas
+      </button>
+    </div>
+  </div>
+
+  <div class="mb-4" id="carrusel-especialidades">
+    <div class="d-flex gap-2 overflow-auto pb-2" id="carrusel-t">
+    </div>
+  </div>
+
+  <div id="vista-tabla" class="card shadow-sm border-0">
+    <div class="table-responsive shadow-sm rounded">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-institucional text-white">
+        <tr>
+          <th>Foto</th>
+          <th>Identificación</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Especialidad</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+        </thead>
+        <tbody id="tabla-atletas-body">
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="vista-tarjetas" class="row g-4 d-none">
+  </div>
+
+  <!-- Panel de confirmación de eliminación -->
+  <div id="contenedor-eliminar" class="card shadow-sm border-danger mt-4 d-none">
+    <div class="card-body">
+      <h5 class="text-danger">¿Eliminar atleta?</h5>
+      <p>Nombre: <strong id="eliminar-nombre-texto"></strong></p>
+      <p>ID: <strong id="eliminar-id-texto"></strong></p>
+      <button id="btn-confirmar-borrado" class="btn btn-danger">Confirmar eliminación</button>
+      <button class="btn btn-secondary" onclick="ocultarSecciones()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Panel de actualización -->
+  <div id="contenedor-actualizar" class="card shadow-sm border-warning mt-4 d-none">
+    <div class="card-body">
+      <h5 class="text-warning">Modificar atleta</h5>
+      <form id="form-actualizar">
+        <input type="hidden" id="modificacion-id-original">
+        <div class="mb-2">
+          <input type="text" id="modificacion-nombre" class="form-control" placeholder="Nombre">
+        </div>
+        <div class="mb-2">
+          <input type="text" id="modificacion-identificacion" class="form-control" placeholder="Identificación">
+        </div>
+        <div class="mb-2">
+          <label class="form-label small fw-bold">Categoría</label>
+          <select id="modificacion-categoria" class="form-select">
+            <option value="">Seleccione</option>
+            <option value="Pre-benjamin">Pre-benjamín</option>
+            <option value="Benjamin">Benjamín</option>
+            <option value="Alevin">Alevín</option>
+            <option value="Infantil">Infantil</option>
+            <option value="Cadetes">Cadetes</option>
+            <option value="Juvenil">Juvenil</option>
+            <option value="Junior">Júnior</option>
+            <option value="Sub-23">Sub-23</option>
+            <option value="Absoluta">Absoluta</option>
+            <option value="Veteranos">Veteranos</option>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small fw-bold">Especialidad</label>
+          <select id="modificacion-especialidad" class="form-select">
+            <option value="">Seleccione</option>
+            <option value="Super Sprint">Super Sprint</option>
+            <option value="Sprint">Sprint</option>
+            <option value="Olimpica">Olímpica</option>
+            <option value="Media Distancia">Media Distancia</option>
+            <option value="Larga Distancia">Larga Distancia</option>
+            <option value="Ultraman">Ultraman</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-warning">Guardar cambios</button>
+        <button type="button" class="btn btn-secondary" onclick="ocultarSecciones()">Cancelar</button>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+</body>
+</html>
