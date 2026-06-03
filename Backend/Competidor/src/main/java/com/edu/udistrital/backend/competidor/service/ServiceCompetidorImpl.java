@@ -294,7 +294,7 @@ public class ServiceCompetidorImpl implements Interfaces{
 
         //Después valida que la carrera si exista
         webClientBean.get()
-                        .uri("/carrera/{idcarrera}", idCarrera)
+                        .uri("/consultarcarrera/{idcarrera}", idCarrera)
                         .retrieve()
                         .bodyToMono(CarreraResponse.class)
                         .block();
@@ -327,7 +327,7 @@ public class ServiceCompetidorImpl implements Interfaces{
 
         //Si cumple con lo anterior se hace una peticióna al API "Carrera"
         CarreraResponse carrera = webClientBean.get()//De tipo consulta
-                .uri("/carrera/{idcarrera}", competidor.getIdCarrera())//El endpoint del api "Carrera"
+                .uri("/consultarcarrera/{idcarrera}", competidor.getIdCarrera())//El endpoint del api "Carrera"
                 .retrieve()//Envía la petición
                 .bodyToMono(CarreraResponse.class)//Esperamos que devuelva un objeto de tipo CarreraResponse
                 .block(); //Vuelve Sincrono
