@@ -1,0 +1,18 @@
+Indicaciones para ejecutar el aplicativo
+
+1.Las BD de cada servicio por defecto estan en el puerto 3306, si su puerto es diferente es necesario cambiarlo manualmente en el application.properties de cada proyecto
+
+2.Es necesario crear la base de datos antes de ejecutar el aplicativo:
+-Nombre de la base de datos de "Competidor" = competidores
+-Nombre de la base de datos de "Carrera" = carreras
+-Nombre de la base de datos de "Categoria" = categorias
+
+3.Para el envío del correo es posible que transcurrido un tiempo la clave de aplicación "api.correo.contraseña" del archivo application.properties de "Competidor" haya expirado y sea necesario crear una nueva, pero como el correo emisor no es de acceso público es necesario cambiarlo también "api.correo.usuario"( para la contraseña de aplicación : https://www.youtube.com/watch?v=h4eVrDSf8Eg)
+
+4.El JDK es el 21
+
+5.En IDE de desarrollo fue Intellij
+
+6.Los puertos utilizados para los 3 proyectos (Competidor, Carrera, Categoria) fueron el 9000, 9001 y 9002 (respectivamente), si es necesario cambiarlos en el application.properties de cada proyecto (tanto el server.port como el api.url.carrera/competidor/categoría)
+
+7.Si es necesario cambiar algún parámetro como los puertos de los proyectos del Back también hay que actualizarlos en los JS del Front 
