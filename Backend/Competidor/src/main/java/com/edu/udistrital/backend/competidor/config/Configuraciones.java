@@ -1,10 +1,12 @@
 package com.edu.udistrital.backend.competidor.config;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -25,7 +27,7 @@ public class Configuraciones {
             registry.addMapping("/**")//todos los EndPoints
                     .allowedMethods("*")//Todos los verbos
                     .allowedHeaders("*")//Acepta cualquier cabecera
-                    .allowedOrigins("http://localhost:8383")//Url del Front
+                    .allowedOrigins("*")//Cualquier URL
                     .maxAge(4000); //Tiempo que puede "recordar" el acceso, de 4 s
             }
         };
@@ -62,7 +64,7 @@ public class Configuraciones {
     private String usuario;
 
     @Value("${api.correo.puerto}")
-    private String puerto;
+    private int puerto;
 
     @Value("${api.correo.provedor}")
     private String provedor;
@@ -78,7 +80,7 @@ public class Configuraciones {
 
         mail.setHost(provedor);//Provedor que usaremos, en nuestro caso Gmail de Google
         mail.setPort(puerto); //Puerto estandar para el envío
-        mail.getUsername(usuario);//Correo que envíar el correo
+        mail.setUsername(usuario);//Correo que envíar el correo
         mail.setPassword(contrasena);//Clave de aplicación
 
         Properties properties = mail.getJavaMailProperties();

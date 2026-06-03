@@ -6,7 +6,7 @@ public class CarreraResponse {
 
     private String nivelDificultad;
     private String ubicacion;
-    private int fechaEjecucion;
+    private Integer fechaEjecucion;
     private String paraQuien;
     private String nombreCarrera;
     private Long id;

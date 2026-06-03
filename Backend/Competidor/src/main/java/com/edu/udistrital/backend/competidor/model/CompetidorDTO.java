@@ -30,7 +30,7 @@ public class CompetidorDTO extends Persona{
 
     //La categoría a la cual pertenece el competidor
     @NotBlank(message = "Debe pertenecer a alguna categoria")
-    @Column(name = "categoria", lenght = 25, nullable = false)
+    @Column(name = "categoria", length = 25, nullable = false)
     private String categoria;
 
     //La especialidad del competidor en el triatlón
@@ -39,10 +39,10 @@ public class CompetidorDTO extends Persona{
     private String especialidad;
 
     @Column(name = "id_carrera")
-    private String idCarrera;
+    private Long idCarrera;
 
     //Constructor que no tiene la llave primaria "id"
-    public CompetidorDTO(String nombre, int edad, String genero, int identificacion, String correo, String foto, Boolean modalidadCross, String categoria, String especialidad, String idCarrera) {
+    public CompetidorDTO(String nombre, int edad, String genero, int identificacion, String correo, String foto, Boolean modalidadCross, String categoria, String especialidad, Long idCarrera) {
         super(nombre, edad, genero, identificacion, correo);
         this.foto = foto;
         this.modalidadCross = modalidadCross;

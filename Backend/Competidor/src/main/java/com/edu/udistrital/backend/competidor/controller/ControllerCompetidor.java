@@ -70,7 +70,7 @@ public class ControllerCompetidor {
      * @return
      */
     @RequestMapping( value = "/modificaridentificacion/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<?> modificarIdentificacion(@PathVariable Long id, @RequestBody Map<String, String> cuerpo){
+    public ResponseEntity<?> modificarIdentificacion(@PathVariable Long id, @RequestBody Map<String, Integer> cuerpo){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(service.modIdentificacion(id, cuerpo.get("identificacion"))); //Delega al service y devuelve 200
         }catch (RuntimeException e){
@@ -110,6 +110,17 @@ public class ControllerCompetidor {
     }
 
     /**
+     * Método para modificar las preferencias del competidor
+     * @param id
+     * @param cuerpo
+     * @return
+     */
+    @RequestMapping(value = "/modificarPreferencias/{id}", method = RequestMethod.PATCH) //No se estan creando, simplemente se modifican
+    public ResponseEntity<?> modificarPreferencias(@PathVariable Long id, @RequestBody Map<String, String> cuerpo){ //El id del competidor y en el cuerpo de la petición las preferencias
+        return ResponseEntity.status(HttpStatus.OK).body(service.modificarPreferencias(id, cuerpo.get("especialidad"), Boolean.parseBoolean(cuerpo.get("modalidadcross"))));
+    }
+
+    /**
      * Método de tipo GET para consultar un competidor por su id
      * @param id
      * @return competidor
@@ -134,12 +145,12 @@ public class ControllerCompetidor {
 
     /**
      * Método tipo GET para consultar la lista de competidores por categoria según edad
-     * @param edad
+     * @param categoria
      * @return
      */
     @RequestMapping(value = "/consultarcategoria", method = RequestMethod.GET)
-    public ResponseEntity<?> consultarListaGenero(@RequestParam("edad") String edad){
-        return ResponseEntity.status(HttpStatus.OK).body(service.buscarListaCategoria(edad));
+    public ResponseEntity<?> consultarListaCategoria(@RequestParam("categoria") String categoria){
+        return ResponseEntity.status(HttpStatus.OK).body(service.buscarListaCategoria(categoria));
     }
 
     /**
@@ -174,13 +185,13 @@ public class ControllerCompetidor {
 
     /**
      * Método tipo PATCH que registra un competidor en una carrera (este registro necesito de Carrera para hacer el registro)
-     * @param id
-     * @param cuerpo
+     * @param idCarrera
+     * @param idCompetidor
      * @return
      */
-    @RequestMapping(value = "/registrarcarrera/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<?> registrarCarrera(@PathVariable Long id, @RequestBody Map<String, String> cuerpo){
-        return ResponseEntity.status(HttpStatus.OK).body(service.registrarCarrera(cuerpo.get("Carrera")));
+    @RequestMapping(value = "/{idCompetidor}/registrarcarrera/{idCarrera}", method = RequestMethod.PATCH)
+    public ResponseEntity<?> registrarCarrera(@PathVariable("idCompetidor") Long idCompetidor, @PathVariable("idCarrera") Long idCarrera){
+        return ResponseEntity.status(HttpStatus.OK).body(service.registrarCarrera(idCompetidor, idCarrera));
     }
 
 

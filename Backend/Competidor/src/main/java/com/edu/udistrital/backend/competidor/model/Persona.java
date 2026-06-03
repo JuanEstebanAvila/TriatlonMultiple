@@ -25,12 +25,12 @@ public class Persona {
 
     @NotNull(message = "La edad no puede estar vacia")//Null para números, no nulos
     @Positive //No hay edades negativas
-    @Column(name = "edad", lenght = 20, nullable = false)
-    private int edad;
+    @Column(name = "edad", nullable = false)
+    private Integer edad;
 
     @NotNull(message = "La identificación no puede estar vacia")
-    @Column(name = "identificacion", unique = true, lenght = 30, nullable = false) //Unique hace que sea único en toda la tabla
-    private int identificacion;
+    @Column(name = "identificacion", unique = true, nullable = false) //Unique hace que sea único en toda la tabla
+    private Integer identificacion;
 
     @NotBlank(message = "El genero no puede estar vacío")
     @Column(name = "genero", length = 10, nullable = false)

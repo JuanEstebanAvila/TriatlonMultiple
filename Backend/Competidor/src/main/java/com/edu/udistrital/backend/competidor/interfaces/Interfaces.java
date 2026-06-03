@@ -1,5 +1,6 @@
 package com.edu.udistrital.backend.competidor.interfaces;
 
+import com.edu.udistrital.backend.competidor.model.CarreraResponse;
 import com.edu.udistrital.backend.competidor.model.CompetidorDTO;
 import com.edu.udistrital.backend.competidor.model.CompetidorResponse;
 
@@ -17,7 +18,7 @@ public interface Interfaces {
 
   public CompetidorResponse modNombre(Long id, String nombreNuevo);
 
-  public CompetidorResponse modIdentificacion(Long id, String nuevaIdentificacion);
+  public CompetidorResponse modIdentificacion(Long id, int nuevaIdentificacion);
 
   public CompetidorResponse modCategoriaEdad(Long id, String nuevaCategoria);
 
@@ -27,9 +28,17 @@ public interface Interfaces {
 
   public List<CompetidorResponse> buscarGenero(String genero);
 
-  public List<CompetidorResponse> buscarEdad(String edad);
+  public List<CompetidorResponse> buscarListaCategoria(String categoria);
 
   public List<CompetidorResponse> buscarEspecialidad(String especialidad);
 
   public List<CompetidorResponse> buscarCross(Boolean cross);
+
+  public String eliminarCompetidor(Long id);
+
+  public CompetidorResponse registrarCarrera(Long idCompetidor, Long idCarrera);
+
+  public CarreraResponse consultarCarrera(Long id);
+
+  public CompetidorResponse modificarPreferencias(Long id, String nuevaEspecialidad, Boolean nuevaModalidadCross);
 }

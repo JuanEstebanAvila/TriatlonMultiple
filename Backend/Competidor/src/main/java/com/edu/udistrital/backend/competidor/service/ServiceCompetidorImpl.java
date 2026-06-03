@@ -1,12 +1,16 @@
 package com.edu.udistrital.backend.competidor.service;
 
 import com.edu.udistrital.backend.competidor.interfaces.Interfaces;
+import com.edu.udistrital.backend.competidor.model.CarreraResponse;
 import com.edu.udistrital.backend.competidor.model.CompetidorDTO;
 import com.edu.udistrital.backend.competidor.model.CompetidorResponse;
 import com.edu.udistrital.backend.competidor.repository.CompetidorRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,21 +18,21 @@ import java.util.List;
 /**
  * Clase Service, encargada de implementar toda la lógica de negocio y por lo tanto de los endpoints
  */
+@Service
 public class ServiceCompetidorImpl implements Interfaces{
 
     //Inyección por constructor de las dependencias
     private final JavaMailSender mail;
-    private final WebClient webClient;
+    private final WebClient webClientBean;
     private final CompetidorRepository repository;
-    private final ModelMapper modelMapper;
+    private final ModelMapper modelMapperBean;
 
-    public ServiceCompetidorImpl(JavaMailSender mail, ModelMapper modelMapper, CompetidorRepository repository, WebClient webClient){
+    public ServiceCompetidorImpl(JavaMailSender mail, ModelMapper modelMapperBean, CompetidorRepository repository, WebClient webClientBean){
         this.mail = mail;
-        this.modelMapper = modelMapper;
-        this.webClient = webClient;
+        this.modelMapperBean = modelMapperBean;
+        this.webClientBean = webClientBean;
         this.repository = repository;
     }
-
 
 
     //Declaración a nivel las variables con la información necesaria para envíar el correo
@@ -59,10 +63,8 @@ public class ServiceCompetidorImpl implements Interfaces{
         CompetidorDTO creado = repository.save(datosCompetidor);
 
         //Envío del correo
-        enviarCorreo(datosCompetidor.getCorreo(), subject, texto)
-                .orElseThrow(()-> new RuntimeException("No se pudo envíar el correo"));
-
-        return modelMapper.map(creado, CompetidorResponse.class);
+        enviarCorreo(datosCompetidor.getCorreo(), subject, texto);
+        return modelMapperBean.map(creado, CompetidorResponse.class);
     }
 
 
@@ -95,7 +97,7 @@ public class ServiceCompetidorImpl implements Interfaces{
         competidor.setNombre(nombreNuevo);
         CompetidorDTO guardado = repository.save(competidor);
 
-        return modelMapper.map(competidor, CompetidorResponse.class);
+        return modelMapperBean.map(guardado, CompetidorResponse.class);
     }
 
 
@@ -106,14 +108,14 @@ public class ServiceCompetidorImpl implements Interfaces{
      * @return
      */
     @Override
-    public CompetidorResponse modIdentificacion(Long id, String nuevaIdentificacion){
+    public CompetidorResponse modIdentificacion(Long id, int nuevaIdentificacion){
         CompetidorDTO competidor = repository.findById(id)
                 .orElseThrow(()->new RuntimeException("No existe un competidor con id " +id));
 
         competidor.setIdentificacion(nuevaIdentificacion);
         CompetidorDTO guardado = repository.save(competidor);
 
-        return modelMapper.map(guardado, CompetidorResponse.class);
+        return modelMapperBean.map(guardado, CompetidorResponse.class);
     }
 
 
@@ -131,7 +133,7 @@ public class ServiceCompetidorImpl implements Interfaces{
         competidor.setCategoria(nuevaCategoria);
         CompetidorDTO guardado = repository.save(competidor);
 
-        return modelMapper.map(guardado, CompetidorResponse.class);
+        return modelMapperBean.map(guardado, CompetidorResponse.class);
     }
 
 
@@ -150,7 +152,27 @@ public class ServiceCompetidorImpl implements Interfaces{
         competidor.setGenero(nuevoGenero);
         CompetidorDTO guardado = repository.save(competidor);
 
-        return modelMapper.map(guardado, CompetidorResponse.class);
+        return modelMapperBean.map(guardado, CompetidorResponse.class);
+    }
+
+    /**
+     * Método para modificar las preferencias de un competidor
+     * @param id
+     * @param nuevaEspecialidad
+     * @param nuevaModalidadCross
+     * @return
+     */
+    @Override
+    public CompetidorResponse modificarPreferencias(Long id, String nuevaEspecialidad, Boolean nuevaModalidadCross){
+        CompetidorDTO competidor = repository.findById(id) //Extraemos el competidor y verificamos que exista
+                .orElseThrow(()-> new RuntimeException("No existe el competidor con id : " + id));
+
+        competidor.setEspecialidad(nuevaEspecialidad); //Actualiza la especialidad
+        competidor.setModalidadCross(nuevaModalidadCross);//Actualiza la modalidad cross
+
+        CompetidorDTO guardado = repository.save(competidor); //Guarda el competidor actualizado
+
+        return modelMapperBean.map(guardado, CompetidorResponse.class);//Mapea de la entidad al response
     }
 
     /**
@@ -163,7 +185,7 @@ public class ServiceCompetidorImpl implements Interfaces{
         CompetidorDTO competidor = repository.findById(id) //Primero se busca en la base de datos
                 .orElseThrow(() -> new RuntimeException("No existe un competidor con id " + id )); //Corroboramos que exista
 
-        return modelMapper.map(competidor, CompetidorResponse.class); //Si todo esta bien, se mapea a un objeto de tipo CompetidorResponse
+        return modelMapperBean.map(competidor, CompetidorResponse.class); //Si todo esta bien, se mapea a un objeto de tipo CompetidorResponse
     }
 
     /**
@@ -173,32 +195,18 @@ public class ServiceCompetidorImpl implements Interfaces{
      */
     @Override
     public List<CompetidorResponse> buscarGenero(String genero){
-        List<CompetidorDTO> listaGenero = repository.findByGenero(genero); //Delegamos al service para que traiga la lista de atletas por género
-
+        List<CompetidorDTO> listaGenero = repository.findByGenero(genero);//Delegamos al service para que traiga la lista de atletas por género
+        if(listaGenero.isEmpty()) {
+            throw new RuntimeException("No existen competidores con ese género");
+        }
         List<CompetidorResponse> listaGeneroResponse = new ArrayList<>(); //Necesitamos mapear a CompetidorResponse
         for(CompetidorDTO competidor : listaGenero){ //Usamos un for para recorrer todos los elementos del arreglo con elementos tipo CompetidorDTO
-            listaGeneroResponse.add(modelMapper.map(competidor, CompetidorResponse.class));
+            listaGeneroResponse.add(modelMapperBean.map(competidor, CompetidorResponse.class));
         }
         return listaGeneroResponse;
 
     }
 
-    /**
-     * Método que consulta la lista de competidores según su edad
-     * @param edad
-     * @return
-     */
-    @Override
-    public List<CompetidorResponse> buscarEdad(String edad){
-        List<CompetidorDTO> listaEdad = repository.findByEdad((edad); //Delegamos al service para que traiga la lista de atletas por género
-
-        List<CompetidorResponse> listaEdadResponse = new ArrayList<>(); //Necesitamos mapear a CompetidorResponse
-        for(CompetidorDTO competidor : listaEdad){ //Usamos un for para recorrer todos los elementos del arreglo con elementos tipo CompetidorDTO
-            listaEdadResponse.add(modelMapper.map(competidor, CompetidorResponse.class));
-        }
-        return listaEdadResponse;
-
-    }
 
     /**
      * Método que busca la lista de competidores según su especialidad
@@ -207,13 +215,34 @@ public class ServiceCompetidorImpl implements Interfaces{
      */
     @Override
     public List<CompetidorResponse> buscarEspecialidad(String especialidad){
-        List<CompetidorDTO> listaEspecialidad = repository.findByEspecialidad(especialidad); //Delegamos al service para que traiga la lista de atletas por género
-
+        List<CompetidorDTO> listaEspecialidad = repository.findByEspecialidad(especialidad);//Delegamos al service para que traiga la lista de atletas por género
+        if(listaEspecialidad.isEmpty()) {
+                throw new RuntimeException("No existen competidores en esa especialidad");
+        }
         List<CompetidorResponse> listaEspecialidadResponse = new ArrayList<>(); //Necesitamos mapear a CompetidorResponse
         for(CompetidorDTO competidor : listaEspecialidad){ //Usamos un for para recorrer todos los elementos del arreglo con elementos tipo CompetidorDTO
-            listaEspecialidadResponse.add(modelMapper.map(competidor, CompetidorResponse.class));
+            listaEspecialidadResponse.add(modelMapperBean.map(competidor, CompetidorResponse.class));
         }
         return listaEspecialidadResponse;
+
+    }
+
+    /**
+     * Método que busca la lista de competidores por categoria
+     * @param categoria
+     * @return
+     */
+    @Override
+    public List<CompetidorResponse> buscarListaCategoria(String categoria){
+        List<CompetidorDTO> listaCategoria = repository.findByCategoria(categoria);//Delegamos al service para que traiga la lista de atletas por género
+        if(listaCategoria.isEmpty()) {
+                throw new RuntimeException("No existen competidores en esa categoría");
+        }
+        List<CompetidorResponse> listaCategoriaResponse = new ArrayList<>(); //Necesitamos mapear a CompetidorResponse
+        for(CompetidorDTO competidor : listaCategoria){ //Usamos un for para recorrer todos los elementos del arreglo con elementos tipo CompetidorDTO
+            listaCategoriaResponse.add(modelMapperBean.map(competidor, CompetidorResponse.class));
+        }
+        return listaCategoriaResponse;
 
     }
 
@@ -224,14 +253,86 @@ public class ServiceCompetidorImpl implements Interfaces{
      */
     @Override
     public List<CompetidorResponse> buscarCross(Boolean cross){
-        List<CompetidorDTO> listaCross = repository.findByModalidadCross((cross); //Delegamos al service para que traiga la lista de atletas por género
-
+        List<CompetidorDTO> listaCross = repository.findByModalidadCross(cross);//Delegamos al service para que traiga la lista de atletas por género
+        if(listaCross.isEmpty()) {
+            throw new RuntimeException("No existen competidores en modalidad cross");
+        }
         List<CompetidorResponse> listaCrossResponse = new ArrayList<>(); //Necesitamos mapear a CompetidorResponse
         for(CompetidorDTO competidor : listaCross){ //Usamos un for para recorrer todos los elementos del arreglo con elementos tipo CompetidorDTO
-            listaCrossResponse.add(modelMapper.map(competidor, CompetidorResponse.class));
+            listaCrossResponse.add(modelMapperBean.map(competidor, CompetidorResponse.class));
         }
         return listaCrossResponse;
 
+    }
+
+    /**
+     * Método para eliminar a un competidor por su id
+     * @param id
+     */
+    public String eliminarCompetidor(Long id){
+        if(repository.findById(id).isEmpty()) { //Primer se verifica que exista el competidor
+            throw new RuntimeException("No se puede eliminar un competidor que no existe");
+        }
+        repository.deleteById(id); //Después de corroborar se delega al repository para que lo elimine
+
+        return ("El competidor con id " + id + " fue eliminado exitosamente");
+    }
+
+
+    /**
+     * Método encargado de registrar una carrera a un competidor,
+     * involucra 2 APIS, API "competidor" y API "carrera"
+     * @param idCompetidor
+     * @param idCarrera
+     * @return
+     */
+    @Override
+    public CompetidorResponse registrarCarrera(Long idCompetidor, Long idCarrera){
+        //Primero extraemos el competidor (identificado con el id) al cual vamos a registrarle una carrera
+        CompetidorDTO competidor = repository.findById(idCompetidor)
+                .orElseThrow(() -> new RuntimeException("Ese competidor no existe")); //Verificación de que exista
+
+        //Después valida que la carrera si exista
+        webClientBean.get()
+                        .uri("/carrera/{idcarrera}", idCarrera)
+                        .retrieve()
+                        .bodyToMono(CarreraResponse.class)
+                        .block();
+
+        competidor.setIdCarrera(idCarrera); //Le asigna la carrera que mando el usuario desde el endpoint
+        CompetidorDTO guardado = repository.save(competidor);
+
+        //Finalmente WebCLient para hacer la petición al proyecto "Carrera" para que guarde el id del competidor
+        webClientBean.patch()//Objeto inyectado en la parte superior y definido en la clase de configuración
+                .uri("/{idcarrera}/agregarcompetidor/{idcompetidor}", idCarrera, idCompetidor)
+                .retrieve()
+                .bodyToMono(CarreraResponse.class)
+                .block();
+        return modelMapperBean.map(guardado,CompetidorResponse.class); //Se mapea de la entidad al Response
+    }
+
+
+    /**
+     * Método para consultar la carrera a la cual pertenece un competidor
+     * @param id
+     * @return
+     */
+    public CarreraResponse consultarCarrera(Long id){
+        CompetidorDTO competidor = repository.findById(id) //Busca a al competidor en la BD
+                .orElseThrow(()-> new RuntimeException("El competidor no existe"));//Si no existe lanza una excepción
+
+        if(competidor.getIdCarrera()==null){ //Comprobamos que el competidor consultado tenga una carrera asignada en su atributo
+            throw new RuntimeException("El competidor no esta registrado a ninguna carrera");
+        }
+
+        //Si cumple con lo anterior se hace una peticióna al API "Carrera"
+        CarreraResponse carrera = webClientBean.get()//De tipo consulta
+                .uri("/carrera/{idcarrera}", competidor.getIdCarrera())//El endpoint del api "Carrera"
+                .retrieve()//Envía la petición
+                .bodyToMono(CarreraResponse.class)//Esperamos que devuelva un objeto de tipo CarreraResponse
+                .block(); //Vuelve Sincrono
+
+        return carrera;
     }
 
 

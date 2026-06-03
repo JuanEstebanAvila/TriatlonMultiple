@@ -6,39 +6,27 @@ public class CompetidorResponse {
 
     private String nombre;
 
-    private int edad;
+    private Integer edad;
 
     private String genero;
 
-    private int identificacion;
+    private Integer identificacion;
 
     private String correo;
 
-    private String nombre;
-
     private String foto;
 
-    private oolean modalidadCross;
+    private Boolean modalidadCross;
 
     private String categoria;
 
     private String especialidad;
 
-    private String idCarrera;
-
-    private String nivelDificultad;
-
-    private String ubicacion;
-
-    private int fechaEjecucion;
-
-    private String paraQuien;
-
-    private String nombreCarrera;
-
+    private CarreraResponse carreraResponse;
     private Long id;
 
     //Getts y Setts
+
     public String getNombre() {
         return nombre;
     }
@@ -55,11 +43,11 @@ public class CompetidorResponse {
         this.foto = foto;
     }
 
-    public oolean getModalidadCross() {
+    public Boolean getModalidadCross() {
         return modalidadCross;
     }
 
-    public void setModalidadCross(oolean modalidadCross) {
+    public void setModalidadCross(Boolean modalidadCross) {
         this.modalidadCross = modalidadCross;
     }
 
@@ -79,52 +67,12 @@ public class CompetidorResponse {
         this.especialidad = especialidad;
     }
 
-    public String getIdCarrera() {
-        return idCarrera;
+    public CarreraResponse getCarreraResponse() {
+        return carreraResponse;
     }
 
-    public void setIdCarrera(String idCarrera) {
-        this.idCarrera = idCarrera;
-    }
-
-    public String getNivelDificultad() {
-        return nivelDificultad;
-    }
-
-    public void setNivelDificultad(String nivelDificultad) {
-        this.nivelDificultad = nivelDificultad;
-    }
-
-    public String getUbicacion() {
-        return ubicacion;
-    }
-
-    public void setUbicacion(String ubicacion) {
-        this.ubicacion = ubicacion;
-    }
-
-    public int getFechaEjecucion() {
-        return fechaEjecucion;
-    }
-
-    public void setFechaEjecucion(int fechaEjecucion) {
-        this.fechaEjecucion = fechaEjecucion;
-    }
-
-    public String getParaQuien() {
-        return paraQuien;
-    }
-
-    public void setParaQuien(String paraQuien) {
-        this.paraQuien = paraQuien;
-    }
-
-    public String getNombreCarrera() {
-        return nombreCarrera;
-    }
-
-    public void setNombreCarrera(String nombreCarrera) {
-        this.nombreCarrera = nombreCarrera;
+    public void setCarreraResponse(CarreraResponse carreraResponse) {
+        this.carreraResponse = carreraResponse;
     }
 
     public Long getId() {
@@ -165,30 +113,5 @@ public class CompetidorResponse {
 
     public void setCorreo(String correo) {
         this.correo = correo;
-    }
-
-    //Constructores
-
-    public CompetidorResponse( ) {
-    }
-
-    public CompetidorResponse(String nombre, int edad, String genero, String correo, int identificacion, String nombre1, String foto, oolean modalidadCross, String categoria, String especialidad, String idCarrera, String nivelDificultad, String ubicacion, int fechaEjecucion, String paraQuien, String nombreCarrera, Long id) {
-        this.nombre = nombre;
-        this.edad = edad;
-        this.genero = genero;
-        this.correo = correo;
-        this.identificacion = identificacion;
-        this.nombre = nombre1;
-        this.foto = foto;
-        this.modalidadCross = modalidadCross;
-        this.categoria = categoria;
-        this.especialidad = especialidad;
-        this.idCarrera = idCarrera;
-        this.nivelDificultad = nivelDificultad;
-        this.ubicacion = ubicacion;
-        this.fechaEjecucion = fechaEjecucion;
-        this.paraQuien = paraQuien;
-        this.nombreCarrera = nombreCarrera;
-        this.id = id;
     }
 }
