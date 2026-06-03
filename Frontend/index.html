@@ -1,33 +1,264 @@
-<!doctype html>
-<html class="no-js" lang="">
-
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title></title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Triatlón UD - Gestión de Atletas</title>
+
+  <!-- framework de bootrap 5 (no se descarga) -->
+
+  <!-- Bootstrap es un framework de CSS (un conjunto de estilos ya escritos por profesionales)
+  que nos permite diseñar interfaces bonitas, modernas y adaptables a celulares y computadores (responsive)
+  sin tener que escribir miles de líneas de CSS desde cero. -->
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- AGREGAR después del link de Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <link rel="stylesheet" href="css/style.css">
-  <meta name="description" content="">
 
-  <meta property="og:title" content="">
-  <meta property="og:type" content="">
-  <meta property="og:url" content="">
-  <meta property="og:image" content="">
-  <meta property="og:image:alt" content="">
-
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" href="/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.png">
-
-  <link rel="manifest" href="site.webmanifest">
-  <meta name="theme-color" content="#fafafa">
 </head>
-
 <body>
 
-  <!-- Add your site or application content here -->
-  <p>Hello world! This is HTML5 Boilerplate.</p>
-  <script src="js/app.js"></script>
+<!-- barra de navegacion (nav bar) -->
+<!--sticky-top esto sirve por si queremos que la nav bar baje con nosotros-->
+<nav class="navbar navbar-expand navbar-dark bg-institucional shadow-sm">
+  <div class="container">
+
+    <!-- logo ud como boton por etiqueta <a> y href -->
+
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="img/Logo Oficial UD sin color en png.png" alt=" img-UD" width="80" class="me-2">
+      <div class="lh-1">
+        <span class="fw-bold d-block">TRIATLÓN </span>
+        <small class="style-subtitle" style="font-size: 0.7rem;">Ingeniería de Sistemas</small>
+      </div>
+    </a>
+
+    <div class="navbar-nav">
+      <a class="nav-link" href="index.html">Inicio</a>
+      <a class="nav-link" href="pages/registro.html">Registro</a>
+      <a class="nav-link" href="pages/listado.html">Gestionar atletas</a>
+      <a class="nav-link" href="pages/consulta.html">Consulta atletas</a>
+      <a class="nav-link" href="pages/carreras.html">Carreras</a>
+      <a class="nav-link" href="pages/categorias.html">Categorías</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Main-->
+<main class="main-content">
+
+  <!-- bienvenida (se le llama hero section nose porque pero aja, le puse id hero) -->
+
+  <!-- class="py-5" Agrega un padding (espacio interno) arriba y abajo de nivel 5.
+  Esto hace que la seccion no se vea apretada. hay un borde muy pequeño dorado que separa esta parte -->
+
+  <section id="hero" class="py-3 text-white bg-institucional border-bottom border-warning">
+    <div class="container">
+      <div class="row align-items-center">
+
+        <!-- En Bootstrap, el sistema de rejilla (grid) divide la pantalla en 12 columnas invisibles.
+        Cuando usas col-#, estás definiendo qué parte de ese total ocupa cada elemento. en porcentaje -->
+
+        <div class="col-7">
+          <h1 class="display-4 fw-bold">Gestión de Triatlón UD</h1>
+          <p class="lead">Plataforma integral para el registro, categorización y seguimiento de atletas de alto rendimiento en las tres disciplinas.</p>
+
+          <!-- boton de registrar atleta -->
+
+          <a href="pages/registro.html" class="btn btn-warning btn-lg fw-bold text-dark">Registrar Atleta Ahora</a>
+        </div>
+        <div class="col-5">
+          <img src="img/80789773-cartel-para-las-competiciones-de-triatlón-ilustración-vectorial-con-corredor-ciclista-y-nadador.jpg" alt="Triatlón" class="img-fluid rounded shadow-lg">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- dashboard o seccion donde aparece atletas y categorias -->
+  <section id="dashboard" class="py-5">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-4">
+
+          <!-- card: Crea un recuadro con un borde gris muy fino,
+          fondo blanco y bordes redondeados. Es la base de la tarjeta. -->
+          <div class="card card-deportiva shadow-sm p-3 border-start border-primary border-4">
+            <h3 class="fw-bold text-primary">Atletas</h3>
+            <p class="display-6" id="count-atletas"></p>
+            <small class="text-muted">Inscritos actualmente</small>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="card card-deportiva shadow-sm p-3 border-start border-primary border-4">
+            <h3 class="fw-bold text-primary">Categorías</h3>
+            <p class="display-6">8</p>
+            <small class="text-muted">Desde Infantil a Veteranos</small>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="card card-deportiva shadow-sm p-3 border-start border-primary border-4">
+            <h3 class="fw-bold text-primary">Disciplinas</h3>
+            <div class="d-flex justify-content-around mt-2">
+              <span class="badge bg-info">Natación</span>
+              <span class="badge bg-success">Ciclismo</span>
+              <span class="badge bg-danger">Carrera</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="info-deporte" class="py-5 bg-white">
+    <div class="container">
+      <h2 class="text-center mb-4 fw-bold ">Sobre el Triatlón</h2>
+      <!-- el row permite dos partes o partidos a la mitad ya que da las 12 unidades de ancho -->
+      <div class="row">
+        <div class="col-6">
+          <h4 class="text-danger">¿En que consiste?</h4>
+          <p>El triatlon es un deporte que implica la realización de 3 disciplinas deportivas, natación, ciclismo y
+            carrera a pie, que se realizan en orden y sin interrupción entre una prueba y la siguiente.El orden a
+            realizar las pruebas es: </p>
+          <p class="text-center fw-bold fs-5">
+            Natación + T1 + Ciclismo + T2 + Carrera
+          </p>
+          <p>Las carreras de triatlon se clasifican en varias modalidades. Por su distancia habiendo corta y larga distancia,
+            si el circuito de ciclismo es en carretera o cross y si permiten el drafting.</p>
+        </div>
+        <div class="col-6">
+          <h4 class="text-danger">Modalidades y Distancias</h4>
+          <!-- lista de categorias -->
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>SuperSprint:</strong> 350m / 10km / 2.5km</li>
+            <li class="list-group-item"><strong>Sprint:</strong> 750m / 20km / 5km</li>
+            <li class="list-group-item"><strong>Olímpico:</strong> 1.5km / 40km / 10km</li>
+            <li class="list-group-item"><strong>Media Distancia:</strong> 1.9km-3km / 80km-90km / 20km</li>
+            <li class="list-group-item"><strong>Larga Distancia (ironman):</strong> 1.4km / 100km-200km / 42km</li>
+            <li class="list-group-item"><strong>Ultraman:</strong> 10km / 415km / 85km</li>
+            <li class="list-group-item"><strong>Cross:</strong> Variantes por montaña y caminos.</li>
+          </ul>
+        </div>
+      </div>
+      <section id="info-deporte-2" class="py-5 bg-white shadow-sm my-4 rounded-3 animar-entrada">
+        <div class="container">
+          <h2 class="text-center fw-bold mb-5 border-bottom pb-3"> Informacion Tecnica del Triatlon</h2>
+          <div class="row g-4 text-center">
+            <div class="col-md-4">
+              <div class="p-4 border-end">
+                <i class="bi bi-Moisture fs-1 text-primary"></i>
+                <h4 class="mt-3 text-danger"> Natacion </h4>
+                <p class="small">Comunmente se realiza en aguas abiertas. Es la fase de mayor resistencia técnica</p>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="p-4 border-end">
+                <i class="bi bi-bicycle fs-1 text-success"></i>
+                <h4 class="mt-3 text-danger">Ciclismo</h4>
+                <p class="small"> No se permite ayuda de los demas "drafting". El "drafting" depende de la reglamentación de la carrera.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-4">
+                <i class="bi bi-person-walking fs-1 text-danger"></i>
+                <h4 class="mt-3 text-danger"> Carrera </h4>
+                <p class="small"> La etapa final donde la fatiga acumulada pone a prueba la mente del atleta.</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 p-4 bg-light rounded border-start border-4 border-danger">
+            <h5><i class="bi bi-tree-fill text-succes"></i> Modalidad cross </h5>
+            <p class="mb-0"> a diferencia del triatlón convencional, el ciclismo se realiza en <strong>MTB (Mountain Bike)</strong> sobre terrenos irregulares. Es ideal para los amantes de la naturaleza y la técnica extrema.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- tabla de categorias -->
+      <section id="categorias" class="py-5">
+        <div class="container">
+          <div class="row">
+            <div class="col-5">
+              <!-- alert le da el relleno (padding) y bordes redondeados.
+              alert-info le aplica el color azul claro -->
+              <div class="alert alert-info border-info shadow-sm">
+                <h4 class="alert-heading fw-bold">
+                  Importante: Categorización
+                </h4>
+                <p>La categoría del atleta se asigna basándose en la edad que el deportista tendrá al 31 de diciembre del año en curso.</p>
+                <hr>
+                <p class="mb-0 small">El sistema valida esta información al momento del registro para garantizar una competencia justa en todas las distancias.</p>
+              </div>
+
+              <div class="alert alert-warning border-warning">
+                <strong>Nota:</strong> Para las modalidades <em>Cross</em>, se aplican las mismas edades.
+              </div>
+            </div>
+
+            <div class="col-7">
+              <div class="card border-0 shadow-sm">
+                <div class="card-header bg-institucional text-white fw-bold">
+                  Tabla de Referencia de Edades
+                </div>
+                <table class="table mb-0">
+                  <thead class="table-light">
+                  <tr>
+                    <th>Rango de Edad</th>
+                    <th>Categoría</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr><td>7 años</td><td>pre benjamin</td></tr>
+                  <tr><td>8 - 9 años</td><td>benjamin</td></tr>
+                  <tr><td>10 - 11 años</td><td>alevin</td></tr>
+                  <tr><td>12 - 13 años</td><td>infantil</td></tr>
+                  <tr><td>14 - 15 años</td><td>Cadetes</td></tr>
+                  <tr><td>16 - 17 años</td><td>Juvenil</td></tr>
+                  <tr><td>18 - 19 años</td><td>Júnior</td></tr>
+                  <tr><td>20 - 23 años</td><td>Sub-23</td></tr>
+                  <tr><td>24 - 39 años</td><td>Absoluta</td></tr>
+                  <tr><td>40+ años</td><td>Veteranos (1, 2 y 3)</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<!-- pie de pagina -->
+
+<footer class="bg-dark text-white pt-4 pb-2 mt-auto">
+  <div class="container">
+    <div class="row text-center text-start">
+      <div class="col-6 mb-3">
+        <h6 class="text-uppercase fw-bold text-dorado">Universidad Distrital Francisco José de Caldas</h6>
+        <p class="small">Proyecto Curricular de Ingeniería de Sistemas<br>
+          Asignatura: Programación Avanzada</p>
+      </div>
+      <div class="col-6 text-md-end mb-3">
+        <h6 class="text-uppercase fw-bold">Desarrollado por:</h6>
+        <p class="small mb-0"> Julian David Muñoz Revelo - 20251020042 <br>
+          Juan Steban Avila Trujillo - 20251020054 <br>
+          Juan sneyder Méndez gil  - 20251020010 <br>
+          Segundo Parcial</p>
+        <p class="small text-muted">Bogotá D.C. - 2026</p>
+      </div>
+    </div>
+    <hr class="bg-secondary">
+    <div class="text-center">
+      <p class="small mb-0">&copy; Todos los derechos no reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Importa el archivo de JavaScript de Bootstrap. Esto es necesario para dar vida a componentes interactivos
+como barras de navegación colapsables, menus desplegables y ventanas modales de alerta -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
 
 </body>
-
 </html>
