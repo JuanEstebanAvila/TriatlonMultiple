@@ -1,19 +1,14 @@
 /**
- * @fileoverview Módulo de gestión de categorías de triatlón.
- * Maneja la comunicación con el microservicio categorias en puerto 8083
+ * Módulo de gestión de categorías de triatlón.
+ * Maneja la comunicación con el microservicio MS3 (Categoria) en puerto 9002
  * mediante Fetch API para operaciones CRUD sobre categorías.
- *
- * @author Julian David Muñoz Revelo - 20251020042
- * @author Juan Steban Avila Trujillo - 20251020054
- * @author Juan Sneyder Méndez Gil - 20251020010
- * @version 1.0
  */
 
 /**
- * URL base del microservicio de categorías MS3.
+ * URL base del microservicio MS3 (Categoria).
  * @constant {string}
  */
-const API_CATEGORIAS = "http://localhost:8083/api/categorias";
+const API_CATEGORIAS = "http://localhost:9002/api/categoria";
 
 /**
  * Lista global de categorías cargada desde MS3.
@@ -35,7 +30,6 @@ function ocultarPanelesCat() {
 
 /**
  * Muestra una alerta flotante en la esquina superior derecha.
- * Desaparece automáticamente después de 3 segundos.
  *
  * @function mostrarMensajeCat
  * @param {string} tipo - 'exitoso', 'warning' o 'error'
@@ -62,6 +56,7 @@ function mostrarMensajeCat(tipo, texto) {
 
 /**
  * Obtiene todas las categorías del servidor MS3 y refresca la tabla.
+ * El MS3 si tiene un endpoint "consultartodas".
  *
  * @async
  * @function obtenerCategorias
@@ -69,19 +64,19 @@ function mostrarMensajeCat(tipo, texto) {
  */
 async function obtenerCategorias() {
   try {
-    const respuesta = await fetch(API_CATEGORIAS);
+    const respuesta = await fetch(`${API_CATEGORIAS}/consultartodas`);
     if (!respuesta.ok) throw new Error("Error al obtener categorías");
     listaCategorias = await respuesta.json();
     renderizarTabla(listaCategorias);
-    document.getElementById('count-categorias').textContent = listaCategorias.length;
+    const contador = document.getElementById('count-categorias');
+    if (contador) contador.textContent = listaCategorias.length;
   } catch (error) {
-    mostrarMensajeCat('error', 'No se pudo conectar con MS3');
+    mostrarMensajeCat('error', 'No se pudo conectar con MS3 (puerto 9002)');
   }
 }
 
 /**
  * Renderiza la tabla HTML con la lista de categorías recibida.
- * Limpia el contenido anterior antes de dibujar.
  *
  * @function renderizarTabla
  * @param {Array<Object>} lista - Array de categorías a renderizar
@@ -90,19 +85,20 @@ async function obtenerCategorias() {
 function renderizarTabla(lista) {
   const cuerpo = document.getElementById('tabla-categorias-body');
   const sinResultados = document.getElementById('mensaje-sin-categorias');
+  if (!cuerpo) return;
   cuerpo.innerHTML = '';
 
   if (lista.length === 0) {
-    sinResultados.classList.remove('d-none');
+    if (sinResultados) sinResultados.classList.remove('d-none');
     return;
   }
-  sinResultados.classList.add('d-none');
+  if (sinResultados) sinResultados.classList.add('d-none');
 
   lista.forEach(cat => {
     const fila = document.createElement('tr');
     fila.innerHTML = `
             <td><span class="badge bg-secondary">${cat.id}</span></td>
-            <td class="fw-bold">${cat.nombre}</td>
+            <td class="fw-bold">${cat.nombreCategoria}</td>
             <td><span class="badge bg-info text-dark">${cat.tipo}</span></td>
             <td class="text-muted small">${cat.descripcion || '—'}</td>
             <td class="text-muted small">${cat.recomendacion || '—'}</td>
@@ -132,7 +128,7 @@ function prepararEliminacionCat(id) {
   const cat = listaCategorias.find(c => c.id === id);
   if (!cat) return;
 
-  document.getElementById('eliminar-cat-nombre').innerText = cat.nombre;
+  document.getElementById('eliminar-cat-nombre').innerText = cat.nombreCategoria;
   document.getElementById('eliminar-cat-tipo').innerText   = cat.tipo;
   document.getElementById('contenedor-eliminar-cat').classList.remove('d-none');
   document.getElementById('contenedor-modificar-cat').classList.add('d-none');
@@ -151,10 +147,10 @@ function prepararEliminacionCat(id) {
  */
 async function eliminarCategoria(id) {
   try {
-    const respuesta = await fetch(`${API_CATEGORIAS}/${id}`, {
+    const respuesta = await fetch(`${API_CATEGORIAS}/eliminar/${id}`, {
       method: 'DELETE'
     });
-    if (respuesta.status === 204) {
+    if (respuesta.ok) {
       mostrarMensajeCat('exitoso', 'Categoría eliminada correctamente');
       ocultarPanelesCat();
       await obtenerCategorias();
@@ -164,7 +160,7 @@ async function eliminarCategoria(id) {
       mostrarMensajeCat('error', 'Error al eliminar la categoría');
     }
   } catch (error) {
-    mostrarMensajeCat('error', 'No se pudo conectar con MS3');
+    mostrarMensajeCat('error', 'No se pudo conectar con MS3 (puerto 9002)');
   }
 }
 
@@ -190,6 +186,7 @@ function prepararModificacionCat(id) {
 
 /**
  * Envía el PATCH de descripción al endpoint correspondiente de MS3.
+ * El MS3 espera un cuerpo JSON con la clave "descripcion".
  *
  * @async
  * @function modificarDescripcion
@@ -201,10 +198,10 @@ async function modificarDescripcion() {
   if (!valor) { mostrarMensajeCat('warning', 'Ingrese una descripción'); return; }
 
   try {
-    const respuesta = await fetch(`${API_CATEGORIAS}/${id}/descripcion`, {
+    const respuesta = await fetch(`${API_CATEGORIAS}/modificardescripcion/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(valor)
+      body: JSON.stringify({ descripcion: valor })
     });
     if (respuesta.ok) {
       mostrarMensajeCat('exitoso', 'Descripción actualizada');
@@ -214,12 +211,13 @@ async function modificarDescripcion() {
       mostrarMensajeCat('error', 'Error al actualizar descripción');
     }
   } catch (error) {
-    mostrarMensajeCat('error', 'No se pudo conectar con MS3');
+    mostrarMensajeCat('error', 'No se pudo conectar con MS3 (puerto 9002)');
   }
 }
 
 /**
  * Envía el PATCH de recomendación al endpoint correspondiente de MS3.
+ * El MS3 espera un cuerpo JSON con la clave "recomendacion".
  *
  * @async
  * @function modificarRecomendacion
@@ -231,10 +229,10 @@ async function modificarRecomendacion() {
   if (!valor) { mostrarMensajeCat('warning', 'Ingrese una recomendación'); return; }
 
   try {
-    const respuesta = await fetch(`${API_CATEGORIAS}/${id}/recomendacion`, {
+    const respuesta = await fetch(`${API_CATEGORIAS}/modificarrecomendacion/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(valor)
+      body: JSON.stringify({ recomendacion: valor })
     });
     if (respuesta.ok) {
       mostrarMensajeCat('exitoso', 'Recomendación actualizada');
@@ -244,7 +242,7 @@ async function modificarRecomendacion() {
       mostrarMensajeCat('error', 'Error al actualizar recomendación');
     }
   } catch (error) {
-    mostrarMensajeCat('error', 'No se pudo conectar con MS3');
+    mostrarMensajeCat('error', 'No se pudo conectar con MS3 (puerto 9002)');
   }
 }
 
@@ -261,14 +259,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (formCat) {
     formCat.addEventListener('submit', async function(e) {
       e.preventDefault();
+      //se arman los campos con los nombres que espera el MS3 (CategoriaDTO)
       const nuevaCategoria = {
-        nombre:       document.getElementById('cat-nombre').value,
-        tipo:         document.getElementById('cat-tipo').value,
-        descripcion:  document.getElementById('cat-descripcion').value,
-        recomendacion:document.getElementById('cat-recomendacion').value
+        nombreCategoria: document.getElementById('cat-nombre').value,
+        tipo:            document.getElementById('cat-tipo').value,
+        descripcion:     document.getElementById('cat-descripcion').value,
+        recomendacion:   document.getElementById('cat-recomendacion').value
       };
       try {
-        const respuesta = await fetch(API_CATEGORIAS, {
+        const respuesta = await fetch(`${API_CATEGORIAS}/crearcategoria`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(nuevaCategoria)
@@ -278,10 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
           formCat.reset();
           await obtenerCategorias();
         } else {
-          mostrarMensajeCat('error', 'Error al crear la categoría');
+          const errorTexto = await respuesta.text();
+          mostrarMensajeCat('error', errorTexto || 'Error al crear la categoría');
         }
       } catch (error) {
-        mostrarMensajeCat('error', 'No se pudo conectar con MS3');
+        mostrarMensajeCat('error', 'No se pudo conectar con MS3 (puerto 9002)');
       }
     });
   }
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const id = document.getElementById('buscar-cat-id').value;
       if (!id) { mostrarMensajeCat('warning', 'Ingrese un ID'); return; }
       try {
-        const respuesta = await fetch(`${API_CATEGORIAS}/${id}`);
+        const respuesta = await fetch(`${API_CATEGORIAS}/consultarcategoria/${id}`);
         if (respuesta.ok) {
           const cat = await respuesta.json();
           renderizarTabla([cat]);
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
           renderizarTabla([]);
         }
       } catch (error) {
-        mostrarMensajeCat('error', 'No se pudo conectar con MS3');
+        mostrarMensajeCat('error', 'No se pudo conectar con MS3 (puerto 9002)');
       }
     });
   }
