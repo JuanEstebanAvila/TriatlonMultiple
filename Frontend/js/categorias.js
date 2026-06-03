@@ -24,8 +24,10 @@ let listaCategorias = [];
 function ocultarPanelesCat() {
   const panelEliminar  = document.getElementById('contenedor-eliminar-cat');
   const panelModificar = document.getElementById('contenedor-modificar-cat');
+  const panelCarreras  = document.getElementById('contenedor-carreras-cat');
   if (panelEliminar)  panelEliminar.classList.add('d-none');
   if (panelModificar) panelModificar.classList.add('d-none');
+  if (panelCarreras)  panelCarreras.classList.add('d-none');
 }
 
 /**
@@ -103,6 +105,10 @@ function renderizarTabla(lista) {
             <td class="text-muted small">${cat.descripcion || '—'}</td>
             <td class="text-muted small">${cat.recomendacion || '—'}</td>
             <td class="text-end">
+                <button class="btn btn-sm btn-primary me-1" title="Ver carreras"
+                        onclick="verCarrerasCategoria(${cat.id})">
+                    <i class="bi bi-trophy"></i>
+                </button>
                 <button class="btn btn-sm btn-warning me-1"
                         onclick="prepararModificacionCat(${cat.id})">
                     <i class="bi bi-pencil"></i>
@@ -241,6 +247,52 @@ async function modificarRecomendacion() {
     } else {
       mostrarMensajeCat('error', 'Error al actualizar recomendación');
     }
+  } catch (error) {
+    mostrarMensajeCat('error', 'No se pudo conectar con MS3 (puerto 9002)');
+  }
+}
+
+/**
+ * Consulta todas las carreras asociadas a una categoria (el MS3 consume al MS2)
+ * y las muestra en el panel de carreras de la categoria.
+ *
+ * @async
+ * @function verCarrerasCategoria
+ * @param {number} id - ID de la categoria
+ * @returns {Promise<void>}
+ */
+async function verCarrerasCategoria(id) {
+  try {
+    const respuesta = await fetch(`${API_CATEGORIAS}/consultarcarreras/${id}`);
+    if (!respuesta.ok) { mostrarMensajeCat('error', 'No se pudo consultar las carreras'); return; }
+    const carreras = await respuesta.json();
+
+    document.getElementById('carreras-cat-titulo').innerText = 'Carreras de la categoría ' + id;
+    document.getElementById('contenedor-carreras-cat').classList.remove('d-none');
+    document.getElementById('contenedor-eliminar-cat').classList.add('d-none');
+    document.getElementById('contenedor-modificar-cat').classList.add('d-none');
+
+    const cuerpo = document.getElementById('tabla-carreras-cat-body');
+    const sinCarreras = document.getElementById('mensaje-sin-carreras-cat');
+    cuerpo.innerHTML = '';
+
+    if (carreras.length === 0) {
+      sinCarreras.classList.remove('d-none');
+    } else {
+      sinCarreras.classList.add('d-none');
+      carreras.forEach(car => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td><span class="badge bg-secondary">${car.id}</span></td>
+            <td class="fw-bold">${car.nombreCarrera}</td>
+            <td class="text-muted small">${car.ubicacion}</td>
+            <td class="small">${car.fechaEjecucion || '—'}</td>
+            <td class="text-muted small">${car.paraQuien || '—'}</td>
+        `;
+        cuerpo.appendChild(fila);
+      });
+    }
+    document.getElementById('contenedor-carreras-cat').scrollIntoView({ behavior: 'smooth' });
   } catch (error) {
     mostrarMensajeCat('error', 'No se pudo conectar con MS3 (puerto 9002)');
   }

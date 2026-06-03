@@ -24,8 +24,10 @@ let listaCarreras = [];
 function ocultarPanelesCar() {
   const panelEliminar  = document.getElementById('contenedor-eliminar-car');
   const panelModificar = document.getElementById('contenedor-modificar-car');
+  const panelInfo      = document.getElementById('contenedor-info-car');
   if (panelEliminar)  panelEliminar.classList.add('d-none');
   if (panelModificar) panelModificar.classList.add('d-none');
+  if (panelInfo)      panelInfo.classList.add('d-none');
 }
 
 /**
@@ -80,7 +82,21 @@ function renderEstrellas(nivel) {
  * @returns {Promise<void>}
  */
 async function obtenerCarreras() {
-  //el MS2 no tiene un endpoint "todas", se muestra lo que haya en la lista local
+  //el MS2 no tiene un endpoint "todas", se consultan los ids del 1 al 30 uno por uno
+  listaCarreras = [];
+  for (let id = 1; id <= 30; id++) {
+    try {
+      const respuesta = await fetch(`${API_CARRERAS}/consultarcarrera/${id}`);
+      if (respuesta.ok) {
+        const car = await respuesta.json();
+        listaCarreras.push(car);
+      }
+    } catch (error) {
+      //si falla la conexion se corta el recorrido
+      mostrarMensajeCar('error', 'No se pudo conectar con MS2 (puerto 9001)');
+      break;
+    }
+  }
   renderizarTablaCarreras(listaCarreras);
   const contador = document.getElementById('count-carreras');
   if (contador) contador.textContent = listaCarreras.length;
@@ -115,6 +131,14 @@ function renderizarTablaCarreras(lista) {
             <td>${renderEstrellas(car.nivelDificultad)}</td>
             <td class="text-muted small">${car.paraQuien || '—'}</td>
             <td class="text-end">
+                <button class="btn btn-sm btn-info me-1" title="Ver inscritos"
+                        onclick="verInscritos(${car.id})">
+                    <i class="bi bi-people"></i>
+                </button>
+                <button class="btn btn-sm btn-primary me-1" title="Ver categoría"
+                        onclick="verCategoriaCarrera(${car.id})">
+                    <i class="bi bi-tag"></i>
+                </button>
                 <button class="btn btn-sm btn-warning me-1"
                         onclick="prepararModificacionCar(${car.id})">
                     <i class="bi bi-pencil"></i>
@@ -261,6 +285,123 @@ async function modificarFecha() {
       await obtenerCarreras();
     } else {
       mostrarMensajeCar('error', 'Error al actualizar fecha');
+    }
+  } catch (error) {
+    mostrarMensajeCar('error', 'No se pudo conectar con MS2 (puerto 9001)');
+  }
+}
+
+/**
+ * Consulta los triatletas inscritos en una carrera (el MS2 consume al MS1)
+ * y los muestra en el panel de informacion.
+ *
+ * @async
+ * @function verInscritos
+ * @param {number} id - ID de la carrera
+ * @returns {Promise<void>}
+ */
+async function verInscritos(id) {
+  try {
+    const respuesta = await fetch(`${API_CARRERAS}/consultarcompetidores/${id}`);
+    if (!respuesta.ok) { mostrarMensajeCar('error', 'No se pudo consultar los inscritos'); return; }
+    const inscritos = await respuesta.json();
+
+    //se muestra el panel y se oculta lo demas
+    document.getElementById('info-car-titulo').innerText = 'Triatletas inscritos en la carrera ' + id;
+    document.getElementById('info-categoria-car').innerHTML = '';
+    document.getElementById('contenedor-info-car').classList.remove('d-none');
+    document.getElementById('contenedor-eliminar-car').classList.add('d-none');
+    document.getElementById('contenedor-modificar-car').classList.add('d-none');
+
+    const cuerpo = document.getElementById('tabla-inscritos-body');
+    const sinInscritos = document.getElementById('mensaje-sin-inscritos');
+    cuerpo.innerHTML = '';
+
+    if (inscritos.length === 0) {
+      sinInscritos.classList.remove('d-none');
+    } else {
+      sinInscritos.classList.add('d-none');
+      inscritos.forEach(comp => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td><span class="badge bg-secondary">${comp.id}</span></td>
+            <td class="fw-bold">${comp.nombre}</td>
+            <td>${comp.identificacion}</td>
+            <td><span class="badge bg-info text-dark">${comp.categoria}</span></td>
+            <td>${comp.especialidad}</td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-outline-danger" title="Eliminar de la carrera"
+                        onclick="eliminarCompetidorCarrera(${id}, ${comp.id})">
+                    <i class="bi bi-person-x"></i>
+                </button>
+            </td>
+        `;
+        cuerpo.appendChild(fila);
+      });
+    }
+    document.getElementById('contenedor-info-car').scrollIntoView({ behavior: 'smooth' });
+  } catch (error) {
+    mostrarMensajeCar('error', 'No se pudo conectar con MS2 (puerto 9001)');
+  }
+}
+
+/**
+ * Consulta la categoria a la que pertenece una carrera (el MS2 consume al MS3)
+ * y la muestra en el panel de informacion.
+ *
+ * @async
+ * @function verCategoriaCarrera
+ * @param {number} id - ID de la carrera
+ * @returns {Promise<void>}
+ */
+async function verCategoriaCarrera(id) {
+  try {
+    const respuesta = await fetch(`${API_CARRERAS}/consultarcategoria/${id}`);
+    if (!respuesta.ok) { mostrarMensajeCar('error', 'La carrera no tiene categoria o no existe'); return; }
+    const cat = await respuesta.json();
+
+    document.getElementById('info-car-titulo').innerText = 'Categoría de la carrera ' + id;
+    document.getElementById('tabla-inscritos-body').innerHTML = '';
+    document.getElementById('mensaje-sin-inscritos').classList.add('d-none');
+
+    //se arma una tarjeta con los datos de la categoria
+    document.getElementById('info-categoria-car').innerHTML = `
+        <div class="alert alert-primary">
+            <h5 class="fw-bold mb-2"><i class="bi bi-tag me-2"></i>${cat.nombreCategoria}</h5>
+            <p class="mb-1"><strong>Tipo:</strong> ${cat.tipo}</p>
+            <p class="mb-1"><strong>Descripción:</strong> ${cat.descripcion}</p>
+            <p class="mb-0"><strong>Recomendación:</strong> ${cat.recomendacion}</p>
+        </div>`;
+
+    document.getElementById('contenedor-info-car').classList.remove('d-none');
+    document.getElementById('contenedor-eliminar-car').classList.add('d-none');
+    document.getElementById('contenedor-modificar-car').classList.add('d-none');
+    document.getElementById('contenedor-info-car').scrollIntoView({ behavior: 'smooth' });
+  } catch (error) {
+    mostrarMensajeCar('error', 'No se pudo conectar con MS2 (puerto 9001)');
+  }
+}
+
+/**
+ * Elimina un competidor de una carrera (el MS2 avisa al MS1).
+ * Llama al endpoint DELETE del MS2 y refresca la lista de inscritos.
+ *
+ * @async
+ * @function eliminarCompetidorCarrera
+ * @param {number} idCarrera - ID de la carrera
+ * @param {number} idCompetidor - ID del competidor a sacar de la carrera
+ * @returns {Promise<void>}
+ */
+async function eliminarCompetidorCarrera(idCarrera, idCompetidor) {
+  try {
+    const respuesta = await fetch(`${API_CARRERAS}/${idCarrera}/eliminarcompetidor/${idCompetidor}`, {
+      method: 'DELETE'
+    });
+    if (respuesta.ok) {
+      mostrarMensajeCar('exitoso', 'Competidor eliminado de la carrera');
+      verInscritos(idCarrera); //se recarga la lista de inscritos
+    } else {
+      mostrarMensajeCar('error', 'No se pudo eliminar el competidor de la carrera');
     }
   } catch (error) {
     mostrarMensajeCar('error', 'No se pudo conectar con MS2 (puerto 9001)');

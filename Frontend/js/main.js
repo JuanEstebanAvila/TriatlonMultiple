@@ -218,7 +218,7 @@ function CrearTabla(listaAtletas){
   listaAtletas.forEach(atleta => {
     const fila = document.createElement('tr');
     fila.innerHTML=`
-        <td> <img src="../img/atleta-default.png" width="40" class="rounded-circle"></td>
+        <td> <img src="${atleta.foto || 'https://cdn-icons-png.flaticon.com/512/1077/1077114.png'}" width="40" height="40" class="rounded-circle" style="object-fit:cover;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1077/1077114.png'"></td>
         <td> ${atleta.identificacion}</td>
         <td>${atleta.nombre}</td>
         <td><span class="badge bg-info text-dark">${atleta.categoria}</span></td>
@@ -253,7 +253,7 @@ function CrearTarjetas(listaAtletas){
     contenedor.innerHTML +=`
         <div class="col-3">
             <div class="card h-100 card-atleta shadow-sm border-top ${colorClase} border-4">
-                <img src="${atleta.foto || 'img/atleta-placeholder.jpg'}" class="card-img-top foto-atleta" alt="${atleta.nombre}">
+                <img src="${atleta.foto || 'https://cdn-icons-png.flaticon.com/512/1077/1077114.png'}" class="card-img-top foto-atleta" alt="${atleta.nombre}" style="height:200px; object-fit:cover;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1077/1077114.png'">
                 <div class="card-body text-center">
                     <span class="badge rounded-pill bg-light text-primary mb-2 border border-primary">
                         ${atleta.categoria}
