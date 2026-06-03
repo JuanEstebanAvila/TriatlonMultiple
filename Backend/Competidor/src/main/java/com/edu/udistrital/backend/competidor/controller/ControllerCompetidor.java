@@ -27,7 +27,7 @@ public class ControllerCompetidor {
     }
 
     /**
-     * Método de tipo POST para crear un competidor y que su vez envía un correo de confirmación al usuario
+     *  Método de tipo POST para crear un competidor y que su vez envía un correo de confirmación al usuario
      * @param datosCompetidor
      * @return
      */
