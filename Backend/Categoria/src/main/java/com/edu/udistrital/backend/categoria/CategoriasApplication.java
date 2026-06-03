@@ -1,4 +1,4 @@
-package com.edu.udistrital.backend.categorias;
+package com.edu.udistrital.backend.categoria;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
