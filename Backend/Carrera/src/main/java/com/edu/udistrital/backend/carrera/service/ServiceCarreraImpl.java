@@ -43,6 +43,16 @@ public class ServiceCarreraImpl implements Interfaces{
     @Override
     public CarreraResponse crearCarrera(CarreraDTO datosCarrera){
         CarreraDTO creada = repository.save(datosCarrera);
+
+        //Si la carrera tiene categoria, se avisa al proyecto "Categoria" para que la registre en su lista
+        if(creada.getIdCategoria() != null){
+            webClientCategoria.patch()
+                    .uri("/{idCategoria}/agregarcarrera/{idCarrera}", creada.getIdCategoria(), creada.getId())
+                    .retrieve()
+                    .bodyToMono(CategoriaResponse.class)
+                    .block();
+        }
+
         return modelMapperBean.map(creada, CarreraResponse.class);
     }
 
